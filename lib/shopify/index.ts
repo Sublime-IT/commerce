@@ -1,14 +1,14 @@
 import {
+  COMMERCE_GRAPHQL_API_ENDPOINT,
   HIDDEN_PRODUCT_TAG,
-  SHOPIFY_GRAPHQL_API_ENDPOINT,
   TAGS
 } from 'lib/constants';
 import { isShopifyError } from 'lib/type-guards';
 import { ensureStartsWith } from 'lib/utils';
 import {
-  revalidateTag,
+  unstable_cacheLife as cacheLife,
   unstable_cacheTag as cacheTag,
-  unstable_cacheLife as cacheLife
+  revalidateTag
 } from 'next/cache';
 import { cookies, headers } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
@@ -24,7 +24,6 @@ import {
   getCollectionQuery,
   getCollectionsQuery
 } from './queries/collection';
-import { getMenuQuery } from './queries/menu';
 import { getPageQuery, getPagesQuery } from './queries/page';
 import {
   getProductQuery,
@@ -47,7 +46,6 @@ import {
   ShopifyCollectionProductsOperation,
   ShopifyCollectionsOperation,
   ShopifyCreateCartOperation,
-  ShopifyMenuOperation,
   ShopifyPageOperation,
   ShopifyPagesOperation,
   ShopifyProduct,
@@ -58,11 +56,10 @@ import {
   ShopifyUpdateCartOperation
 } from './types';
 
-const domain = process.env.SHOPIFY_STORE_DOMAIN
-  ? ensureStartsWith(process.env.SHOPIFY_STORE_DOMAIN, 'https://')
+const domain = process.env.COMMERCE_DOMAIN
+  ? ensureStartsWith(process.env.COMMERCE_DOMAIN, 'https://')
   : '';
-const endpoint = `${domain}${SHOPIFY_GRAPHQL_API_ENDPOINT}`;
-const key = process.env.SHOPIFY_STOREFRONT_ACCESS_TOKEN!;
+const endpoint = `${domain}${COMMERCE_GRAPHQL_API_ENDPOINT}`;
 
 type ExtractVariables<T> = T extends { variables: object }
   ? T['variables']
@@ -82,7 +79,7 @@ export async function shopifyFetch<T>({
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-Shopify-Storefront-Access-Token': key,
+        // 'X-Shopify-Storefront-Access-Token': key,
         ...headers
       },
       body: JSON.stringify({
@@ -368,22 +365,23 @@ export async function getMenu(handle: string): Promise<Menu[]> {
   cacheTag(TAGS.collections);
   cacheLife('days');
 
-  const res = await shopifyFetch<ShopifyMenuOperation>({
-    query: getMenuQuery,
-    variables: {
-      handle
-    }
-  });
+  return [];
+  // const res = await shopifyFetch<ShopifyMenuOperation>({
+  //   query: getMenuQuery,
+  //   variables: {
+  //     handle
+  //   }
+  // });
 
-  return (
-    res.body?.data?.menu?.items.map((item: { title: string; url: string }) => ({
-      title: item.title,
-      path: item.url
-        .replace(domain, '')
-        .replace('/collections', '/search')
-        .replace('/pages', '')
-    })) || []
-  );
+  // return (
+  //   res.body?.data?.menu?.items.map((item: { title: string; url: string }) => ({
+  //     title: item.title,
+  //     path: item.url
+  //       .replace(domain, '')
+  //       .replace('/collections', '/search')
+  //       .replace('/pages', '')
+  //   })) || []
+  // );
 }
 
 export async function getPage(handle: string): Promise<Page> {

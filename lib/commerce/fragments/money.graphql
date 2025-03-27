@@ -1,0 +1,5 @@
+fragment money on Money {
+    centAmount
+    currencyCode
+    fractionDigits
+}

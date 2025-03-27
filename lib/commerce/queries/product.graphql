@@ -1,0 +1,10 @@
+query GetProducts($channel: String!, $query: String) {
+  products(channel: $channel, query: $query, first: 100) {
+    edges {
+      node {
+        id
+      }
+    }
+  }
+}
+

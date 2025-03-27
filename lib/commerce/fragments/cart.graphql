@@ -1,0 +1,43 @@
+fragment cart on Cart {
+  id
+  subtotalPrice {
+    ...money
+  }
+  totalPrice {
+    ...money
+  }
+  taxedPrice {
+    totalTax {
+      ...money
+    }
+  }
+  lineItems(first: 100) {
+    edges {
+      node {
+        id
+        quantity
+        total {
+          ...money
+        }
+        productName
+        productSlug
+        product {
+          id
+        }
+        variantName
+        variant {
+          id
+          name
+          image {
+            src
+          }
+          selectedAttributes {
+            name
+            value
+          }
+        }
+      }
+    }
+  }
+  totalQuantity
+}

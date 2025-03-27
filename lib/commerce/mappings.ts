@@ -23,7 +23,7 @@ const commerceMoneyToVercelMoney = (money?: MoneyFragment): Money => {
 export const commerceCartToVercelCart = (cart: CartFragment): Cart => {
   return {
     id: cart.id,
-    checkoutUrl: "",
+    checkoutUrl: "/",
     totalQuantity: cart.totalQuantity,
     cost: {
       subtotalAmount: commerceMoneyToVercelMoney(cart.subtotalPrice),
